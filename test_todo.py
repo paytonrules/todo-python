@@ -30,6 +30,11 @@ class TestTodo(unittest.TestCase):
 
         self.assertEqual(self.notepad.todos(), tuple())
 
+    def test_remove_todo_by_index(self):
+        self.notepad.write("irrelevant")
+        self.notepad.remove_indexed(0)
+
+        self.assertEqual(self.notepad.todos(), tuple())
 
 class TestFileCabinet(unittest.TestCase):
     def setUp(self):
@@ -65,7 +70,7 @@ class TestFileCabinet(unittest.TestCase):
         self.stream.seek(0)
         cabinet = todo.FileCabinet(self.stream)
         todoList = todo.Notepad()
-        cabinet.takeOut(todoList)
+        cabinet.take_out(todoList)
 
         self.assertEqual(todoList.todos(), ("todo 1", "todo 2"))
 
@@ -74,7 +79,7 @@ class TestFileCabinet(unittest.TestCase):
         self.stream.seek(0)
         cabinet = todo.FileCabinet(self.stream)
         todoList = todo.Notepad()
-        cabinet.takeOut(todoList)
+        cabinet.take_out(todoList)
         todoList.write("todo 2")
         cabinet.store(todoList)
 
@@ -109,11 +114,21 @@ class TestConsole(unittest.TestCase):
         self.assertEqual(stream.getvalue(), "schedule birthday")
 
     def test_loads_the_initial_todos_from_the_stream(self):
-        channel = TestConsole.FakeChannel(['y', 'Second Todo','n'])
         stream = io.StringIO()
         stream.write("First todo\n")
         stream.seek(0)
+        channel = TestConsole.FakeChannel(['y', 'Second Todo','n'])
         console = todo.Console(channel, stream)
         console.start()
 
         self.assertEqual(stream.getvalue(), "First todo\nSecond Todo")
+
+    def test_marks_a_todo_as_done_when_asked(self):
+        stream = io.StringIO()
+        stream.write("First todo\n")
+        stream.seek(0)
+        channel = TestConsole.FakeChannel(['c', '1','n'])
+        console = todo.Console(channel, stream)
+        console.start()
+
+        self.assertEqual(stream.getvalue(), "")
