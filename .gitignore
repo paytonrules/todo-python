@@ -1,5 +1,6 @@
-# Created by https://www.gitignore.io/api/emacs,python
+todo.txt
 
+# Created by https://www.gitignore.io/api/emacs,python
 ### Emacs ###
 # -*- mode: gitignore; -*-
 *~

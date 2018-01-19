@@ -42,8 +42,13 @@ class Console:
 
     def start(self):
         self._fileCabinet.takeOut(self._todolist)
+        self._channel.output("Here's your current todos.")
+        for todo in self._todolist.todos():
+            self._channel.output(todo)
+        self._channel.output("Do you have any more? (y/n)")
         while self._channel.input() != 'n':
             self._todolist.write(self._channel.input())
+            self._channel.output("More to do? (y/n)")
 
         self._fileCabinet.store(self._todolist)
 
