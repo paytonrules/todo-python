@@ -97,8 +97,8 @@ class TestConsole(unittest.TestCase):
         def output(self, text):
             pass
 
-    def test_ends_when_input_is_no(self):
-        channel = TestConsole.FakeChannel(['n'])
+    def test_ends_when_input_is_exit(self):
+        channel = TestConsole.FakeChannel([todo.Commands.EXIT])
         stream = io.StringIO()
         console = todo.Console(channel, stream)
         console.start()
@@ -106,7 +106,10 @@ class TestConsole(unittest.TestCase):
         self.assertEqual(stream.getvalue(), "")
 
     def test_accepts_a_todo_after_a_y(self):
-        channel = TestConsole.FakeChannel(['y', 'schedule birthday', 'n'])
+        channel = TestConsole.FakeChannel([
+            todo.Commands.ADD,
+            'schedule birthday',
+            todo.Commands.EXIT])
         stream = io.StringIO()
         console = todo.Console(channel, stream)
         console.start()
@@ -117,7 +120,10 @@ class TestConsole(unittest.TestCase):
         stream = io.StringIO()
         stream.write("First todo\n")
         stream.seek(0)
-        channel = TestConsole.FakeChannel(['y', 'Second Todo','n'])
+        channel = TestConsole.FakeChannel([
+            todo.Commands.ADD,
+            'Second Todo',
+            todo.Commands.EXIT])
         console = todo.Console(channel, stream)
         console.start()
 
@@ -127,7 +133,10 @@ class TestConsole(unittest.TestCase):
         stream = io.StringIO()
         stream.write("First todo\n")
         stream.seek(0)
-        channel = TestConsole.FakeChannel(['c', '1','n'])
+        channel = TestConsole.FakeChannel([
+            todo.Commands.COMPLETE,
+            '1',
+            todo.Commands.EXIT])
         console = todo.Console(channel, stream)
         console.start()
 
