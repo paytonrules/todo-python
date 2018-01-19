@@ -41,8 +41,8 @@ class IOChannel:
         self._output(text)
 
 class Commands:
-    EXIT = 'n'
-    ADD = 'y'
+    EXIT = 'e'
+    ADD = 'a'
     COMPLETE = 'c'
 
 class Console:
@@ -51,33 +51,42 @@ class Console:
         self._fileCabinet = FileCabinet(stream)
         self._todolist = Notepad()
 
+    def start(self):
+        self._fileCabinet.take_out(self._todolist)
+
+        moreCommands = True
+        while moreCommands:
+            self._print_todos()
+            self._request_next_command()
+            moreCommands = self._process_command(self._channel.input())
+
+        self._fileCabinet.store(self._todolist)
+
     def _print_todos(self):
         self._channel.output("Here's your current todos.")
 
         for idx, todo in enumerate(self._todolist.todos()):
             self._channel.output("{0} {1}".format(idx + 1,todo))
 
-    def start(self):
-        self._fileCabinet.take_out(self._todolist)
-
-        while True:
-            self._print_todos()
+    def _request_next_command(self):
             self._channel.output("Would you like to:")
             self._channel.output("{0} - Add Todo".format(Commands.ADD))
             self._channel.output("{0} - Complete A Todo".format(Commands.COMPLETE))
             self._channel.output("{0} - Exit".format(Commands.EXIT))
             self._channel.output("Enter {0}/{1}/{2}".format(Commands.ADD, Commands.COMPLETE, Commands.EXIT))
 
-            input = self._channel.input()
-            if input == Commands.EXIT:
-                break;
-            elif input == Commands.ADD:
-                self._todolist.write(self._channel.input())
-            elif input == Commands.COMPLETE:
-                idx = int(self._channel.input())
-                self._todolist.remove_indexed(idx - 1)
+    def _process_command(self, input):
+        if input == Commands.EXIT:
+            return False;
+        elif input == Commands.ADD:
+            self._channel.output("Please enter yet another thing to do.")
+            self._todolist.write(self._channel.input())
+        elif input == Commands.COMPLETE:
+            self._channel.output("Hooray! Which todo did you complete!")
+            idx = int(self._channel.input())
+            self._todolist.remove_indexed(idx - 1)
 
-        self._fileCabinet.store(self._todolist)
+        return True
 
 if __name__ == "__main__":
     channel = IOChannel(input, print)
